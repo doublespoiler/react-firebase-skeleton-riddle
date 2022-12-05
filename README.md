@@ -1,3 +1,30 @@
+NESW
+
+gameController{
+  rooms object
+  completedRooms number
+  totalFails number
+  currentFails number
+  if currentFails >= totalFails
+    gameover(death)
+}
+
+room [
+  id string
+  riddle string
+  answers[string]
+  correctAnswer string
+    if null, we NEVER add to currentFails
+  connectedRooms[string]
+  imageURL string DO LATER
+]
+
+const q = query(
+  collection(db, "rooms"), 
+  where("id", "==", id)
+);
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
