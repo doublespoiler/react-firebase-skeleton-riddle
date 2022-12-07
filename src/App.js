@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import Controls from './components/Controls';
 import Display from './components/Display';
@@ -10,16 +10,54 @@ import db from "./Firebase";
 
 function App() {
 
-  var startRoom;
-
-
-
   //get the first room from firestore
   //store it in startRoom
   const [currentRoom, setCurrentRoom] = useState(undefined);
   const [roomsCleared, setRoomsCleared] = useState(0);
   const [roomsFailed, setRoomsFailed] = useState(0);
-  const [rooms, setRooms] = useState([]);
+
+  const goToRoom = (answer) => {
+    const nextRoom = currentRoom.answers.indexOf(answer);
+    const docRef = doc(db, "rooms", currentRoom.connectedRooms[nextRoom]); 
+    getDoc(docRef).then((doc) => {
+      if (doc.exists()) {
+        setCurrentRoom(doc.data());
+        console.log("next room");
+        console.log(doc.data());
+        //if the next room is "start" (which means we'd restart the game)
+        if(currentRoom.connectedRooms[0] === "start"){
+          //reset rooms cleared and fail state, triggering their useEffects
+          setRoomsFailed(0);
+          setRoomsCleared(0);
+        }
+      } else {
+        window.alert("Room does not exist!" + currentRoom.connectedRooms[nextRoom]);
+      }
+    });
+  }
+
+  const handleClick = (answer) => {
+    if (answer == null){
+      window.alert("please pick a valid answer");
+    } else if (answer === "death"){
+      goToRoom("death");
+    }
+      else if (currentRoom.correctAnswer == null || answer === currentRoom.correctAnswer){
+      goToRoom(answer);
+      setRoomsCleared(roomsCleared + 1);
+    } else {
+      window.alert("You answered wrong!");
+      setRoomsFailed(roomsFailed + 1);
+      if(roomsFailed >= 3){
+        if(roomsFailed === 3){
+          goToRoom("death");
+        }
+      } else {
+        goToRoom(answer);
+      }
+    }
+    console.log('handleclick');
+  }
 
   //setting the initial room
   useEffect(() => {
@@ -46,25 +84,6 @@ function App() {
     const failed = document.getElementById("rooms-failed");
     failed.innerText = roomsFailed;
   }, [roomsFailed]);
-
-  const handleClick = (answer) => {
-    if (currentRoom.correctAnswer == null){
-      const nextRoom = currentRoom.answers.indexOf(answer);
-      console.log('next room');
-      console.log(nextRoom);
-      const docRef = doc(db, "rooms", currentRoom.connectedRooms[nextRoom]); 
-      getDoc(docRef).then((doc) => {
-        if (doc.exists()) {
-          setCurrentRoom(doc.data());
-        }
-      });
-    } else if (answer === currentRoom.correctAnswer){
-
-    } else {
-
-    }
-    console.log('handleclick');
-  }
 
   return (
     <main>
