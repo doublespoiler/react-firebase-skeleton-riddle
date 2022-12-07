@@ -13,7 +13,7 @@ function Display(props){
         alt="skeleman"
       />
       <div className="main--text">
-        <h2>asdf</h2>
+        <h2>{riddle}</h2>
       </div>
       
     </div>
