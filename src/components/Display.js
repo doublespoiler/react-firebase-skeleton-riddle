@@ -1,5 +1,11 @@
-import skeleman from "./../images/skeleman.png"
-function Display(){
+import skeleman from "./../images/skeleman.png";
+import React from "react";
+import PropTypes from "prop-types";
+
+
+function Display(props){
+  const { riddle } = props;
+
   return(
     <div className="main--display">
       <img src={skeleman} 
@@ -7,12 +13,15 @@ function Display(){
         alt="skeleman"
       />
       <div className="main--text">
-        <h2>Insert Riddle Here</h2>
-        <p>asdf</p>
+        <h2>asdf</h2>
       </div>
       
     </div>
   )
+}
+
+Display.propTypes = {
+  riddle: PropTypes.string
 }
 
 export default Display;
